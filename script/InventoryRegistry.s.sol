@@ -25,12 +25,11 @@ contract MyDeploymentScript is Script {
             address(inventoryRegistry)
         );
         console2.log("Owner of InventoryRegistry:", inventoryRegistry.owner());
-
         // Create a clone of InventoryRegistry using BoringFactory
         address inventoryRegistryCloneAddress = factory.deploy(
             address(inventoryRegistry),
             abi.encode(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266),
-            true
+            false
         );
         InventoryRegistry inventoryRegistryClone = InventoryRegistry(
             inventoryRegistryCloneAddress

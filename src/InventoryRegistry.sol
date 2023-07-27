@@ -17,8 +17,8 @@ import "openzeppelin-contracts/proxy/utils/Initializable.sol";
 contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     constructor(address _owner) Owned(_owner) SolidStateERC1155() {}
 
-    function init(address _owner) public initializer {
-        owner = _owner;
+    function init(bytes calldata data) external payable initializer {
+        owner = abi.decode(data, (address));
     }
 
     uint256 private tokenId = 1;
