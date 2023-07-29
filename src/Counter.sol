@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "../lib/solmate/src/auth/Owned.sol";
-import "../lib/openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
+import {Owned} from "@solmate/auth/Owned.sol";
+import {Initializable} from "@openzeppelin/proxy/utils/Initializable.sol";
 
 contract Counter is Owned, Initializable {
     uint256 public number;
