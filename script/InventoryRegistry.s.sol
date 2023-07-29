@@ -11,9 +11,8 @@ contract MyDeploymentScript is Script {
         vm.startBroadcast();
         console2.log(address(this));
 
-        BoringFactory factory = BoringFactory(
-            0x021DBfF4A864Aa25c51F0ad2Cd73266Fde66199d
-        );
+        BoringFactory factory =
+            BoringFactory(0x021DBfF4A864Aa25c51F0ad2Cd73266Fde66199d);
 
         // Deploy InventoryRegistry
         InventoryRegistry inventoryRegistry = new InventoryRegistry(
@@ -21,8 +20,7 @@ contract MyDeploymentScript is Script {
         );
 
         console2.log(
-            "InventoryRegistry deployed to:",
-            address(inventoryRegistry)
+            "InventoryRegistry deployed to:", address(inventoryRegistry)
         );
         console2.log("Owner of InventoryRegistry:", inventoryRegistry.owner());
         // Create a clone of InventoryRegistry using BoringFactory
@@ -31,9 +29,8 @@ contract MyDeploymentScript is Script {
             abi.encode(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266),
             false
         );
-        InventoryRegistry inventoryRegistryClone = InventoryRegistry(
-            inventoryRegistryCloneAddress
-        );
+        InventoryRegistry inventoryRegistryClone =
+            InventoryRegistry(inventoryRegistryCloneAddress);
         console2.log(
             "Clone of InventoryRegistry deployed to:",
             inventoryRegistryCloneAddress

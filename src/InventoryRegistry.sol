@@ -36,29 +36,29 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     mapping(uint256 => uint256) public tokenIdToDefinitionId;
     mapping(uint256 => string) public tokenIdToAttribute;
 
-    event setTokenDefinition(
-        uint256 indexed tokenId,
-        uint256 indexed definitionId
+    event SetTokenDefinition(
+        uint256 indexed tokenId, uint256 indexed definitionId
     );
 
-    event createdDefinition(
+    event CreatedDefinition(
         uint256 indexed definitionId,
         uint256 indexed tokenId,
         string indexed definitionUri
     );
 
-    event updatedDefinition(
+    event UpdatedDefinition(
         uint256 indexed definitionId,
         string indexed oldDefinitionUri,
         string indexed newDefinitionUri
     );
 
-    function createItemDefinition(
-        string calldata definitionUri
-    ) external onlyOwner {
+    function createItemDefinition(string calldata definitionUri)
+        external
+        onlyOwner
+    {
         definitionIdToUri[definitionId] = definitionUri;
         definitionIdToTokenIds[definitionId].push(tokenId);
-        emit createdDefinition(definitionId, tokenId, definitionUri);
+        emit CreatedDefinition(definitionId, tokenId, definitionUri);
         definitionId++;
         tokenId++;
     }
@@ -69,18 +69,20 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     ) external onlyOwner {
         string memory oldDefinitionUri = definitionIdToUri[_definitionId];
         definitionIdToUri[_definitionId] = newDefinitionUri;
-        emit updatedDefinition(tokenId, oldDefinitionUri, newDefinitionUri);
+        emit UpdatedDefinition(tokenId, oldDefinitionUri, newDefinitionUri);
     }
 
-    function setAttribute(
-        uint256 tokenId_,
-        string calldata attribute_
-    ) external onlyOwner {
+    function setAttribute(uint256 tokenId_, string calldata attribute_)
+        external
+        onlyOwner
+    {
         // onlyAttributor(tokenIdToDefinitionId[tokenId]) {
         tokenIdToAttribute[tokenId_] = attribute_;
     }
 
-    function burnFrom(address player, uint256 tokenId_, uint256 amount) public {
+    function burnFrom(address player, uint256 tokenId_, uint256 amount)
+        public
+    {
         require(isApprovedForAll(player, msg.sender), "Caller is not approved");
         _burn(player, tokenId_, amount);
     }
@@ -92,10 +94,10 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         bool isFungible
     ) public onlyOwner returns (uint256 mintedTokenId) {
         if (isFungible) {
-            uint256 existingTokenId = definitionIdToTokenIds[itemDefinitionId][
-                0
-            ];
+            uint256 existingTokenId =
+                definitionIdToTokenIds[itemDefinitionId][0];
             _mint(to, existingTokenId, amount, "");
+            return existingTokenId;
         } else {
             _mint(to, tokenId, amount, "");
             tokenId++;
