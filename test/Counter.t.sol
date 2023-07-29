@@ -8,7 +8,8 @@ contract CounterTest is Test {
     Counter public counter;
 
     function setUp() public {
-        counter = new Counter();
+        counter = new Counter(address(this));
+        counter.init(abi.encode(address(this)));
         counter.setNumber(0);
     }
 

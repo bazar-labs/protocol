@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-contract Counter {
+import {Owned} from "solmate/auth/Owned.sol";
+import {Initializable} from
+    "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
+
+contract Counter is Owned, Initializable {
     uint256 public number;
 
-    function setNumber(uint256 newNumber) public {
+    constructor(address _owner) Owned(_owner) {}
+
+    function init(bytes calldata data) external payable initializer {
+        owner = abi.decode(data, (address));
+    }
+
+    function setNumber(uint256 newNumber) public onlyOwner {
         number = newNumber;
     }
 
