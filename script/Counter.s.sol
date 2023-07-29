@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script} from "@forge-std/Script.sol";
-import {console2} from "@forge-std/console2.sol";
-import {BoringFactory} from "@BoringSolidity/BoringFactory.sol";
+import {Script} from "forge-std/Script.sol";
+import {console2} from "forge-std/console2.sol";
+import {BoringFactory} from "BoringSolidity/BoringFactory.sol";
 import {Counter} from "../src/Counter.sol";
 
 contract CounterScript is Script {
