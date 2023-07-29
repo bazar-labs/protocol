@@ -1,0 +1,2 @@
+- use ` forge install` with `--no-commit`
+- always regenarate the mappings via `forge remappings > remappings.txt`
