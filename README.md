@@ -1,2 +1,2 @@
 - use ` forge install` with `--no-commit`
-- never use import remappings
+- always regenarate the mappings via `forge remappings > remappings.txt`
