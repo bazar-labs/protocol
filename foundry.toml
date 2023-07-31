@@ -5,5 +5,3 @@ libs = ["lib"]
 
 [fmt]
 line_length = 80
-
-# See more config options https://github.com/foundry-rs/foundry/tree/master/config

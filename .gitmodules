@@ -12,4 +12,4 @@
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 [submodule "lib/BoringSolidity"]
 	path = lib/BoringSolidity
-	url = https://github.com/boringcrypto/BoringSolidity
+	url = https://github.com/BoringCrypto/BoringSolidity
