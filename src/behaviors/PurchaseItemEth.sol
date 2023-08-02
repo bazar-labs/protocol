@@ -14,7 +14,7 @@ import "./BaseBehavior.sol";
 import "solmate/auth/Owned.sol";
 import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 
-contract PurchaseCurrencyEth is BaseBehavior, Owned, Initializable {
+contract PurchaseItemEth is BaseBehavior, Owned, Initializable {
     mapping(uint256 => uint256) public prices;
 
     event CurrencyPurchased(
