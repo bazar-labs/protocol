@@ -23,8 +23,8 @@ contract DeployMasterContracts is Script {
         factory = new BoringFactory();
 
         // inventory
-        controller = new InventoryController(tx.origin);
         registry = new InventoryRegistry(tx.origin);
+        controller = new InventoryController(tx.origin);
 
         // behaviors
         purchase =
