@@ -12,8 +12,8 @@ contract DeployMasterContracts is Script {
         public
         returns (
             BoringFactory factory,
-            InventoryController controller,
             InventoryRegistry registry,
+            InventoryController controller,
             PurchaseItemEth purchase
         )
     {
