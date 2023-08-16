@@ -20,22 +20,13 @@ contract InventoryController is Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
-    function setBehavior(IInventoryBehavior behavior, bool state)
-        public
-        onlyOwner
-    {
+    function setBehavior(IInventoryBehavior behavior, bool state) public onlyOwner {
         isInventoryBehavior[behavior] = state;
         emit BehaviorSet(behavior, state);
     }
 
-    function executeBehavior(IInventoryBehavior behavior, bytes calldata data)
-        public
-        payable
-    {
-        require(
-            isInventoryBehavior[behavior],
-            "Behavior isn't in isInventoryBehavior"
-        );
+    function executeBehavior(IInventoryBehavior behavior, bytes calldata data) public payable {
+        require(isInventoryBehavior[behavior], "Behavior isn't in isInventoryBehavior");
         behavior.execute{value: msg.value}(msg.sender, data);
     }
 }

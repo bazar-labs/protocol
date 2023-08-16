@@ -7,10 +7,7 @@ abstract contract BaseBehavior {
     address public inventoryController;
     IInventoryRegistry public inventoryRegistry;
 
-    constructor(
-        address inventoryController_,
-        IInventoryRegistry inventoryRegistry_
-    ) {
+    constructor(address inventoryController_, IInventoryRegistry inventoryRegistry_) {
         inventoryController = inventoryController_;
         inventoryRegistry = inventoryRegistry_;
     }
@@ -25,8 +22,5 @@ abstract contract BaseBehavior {
         _;
     }
 
-    function execute(address player, bytes calldata data)
-        public
-        payable
-        virtual;
+    function execute(address player, bytes calldata data) public payable virtual;
 }

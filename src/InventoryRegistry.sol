@@ -13,17 +13,9 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     mapping(uint256 => string) public itemDefIDToURI;
     mapping(uint256 => uint256[]) public itemDefIDToTokenIDs;
 
-    event ItemDefinitionCreated(
-        uint256 indexed itemDefID,
-        uint256 indexed tokenID,
-        string indexed itemDefURI
-    );
+    event ItemDefinitionCreated(uint256 indexed itemDefID, uint256 indexed tokenID, string indexed itemDefURI);
 
-    event ItemDefinitionUpdated(
-        uint256 indexed itemDefID,
-        string indexed oldItemDefURI,
-        string indexed newItemDefURI
-    );
+    event ItemDefinitionUpdated(uint256 indexed itemDefID, string indexed oldItemDefURI, string indexed newItemDefURI);
 
     constructor(address _owner) Owned(_owner) SolidStateERC1155() {}
 
@@ -31,10 +23,7 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
-    function createItemDefinition(string calldata itemDefURI)
-        external
-        onlyOwner
-    {
+    function createItemDefinition(string calldata itemDefURI) external onlyOwner {
         itemDefIDToURI[_itemDefID] = itemDefURI;
         itemDefIDToTokenIDs[_itemDefID].push(_tokenID);
         emit ItemDefinitionCreated(_itemDefID, _tokenID, itemDefURI);
@@ -42,10 +31,7 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         _tokenID++;
     }
 
-    function updateItemDefinition(
-        uint256 itemDefID,
-        string calldata newItemDefURI
-    ) external onlyOwner {
+    function updateItemDefinition(uint256 itemDefID, string calldata newItemDefURI) external onlyOwner {
         string memory oldItemDefURI = itemDefIDToURI[itemDefID];
         itemDefIDToURI[itemDefID] = newItemDefURI;
         emit ItemDefinitionUpdated(_tokenID, oldItemDefURI, newItemDefURI);
@@ -56,12 +42,7 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         _burn(player, tokenID, amount);
     }
 
-    function mintTo(
-        address to,
-        uint256 amount,
-        uint256 itemDefID,
-        bool isFungible
-    ) public onlyOwner returns (uint256 mintedTokenID) {
+    function mintTo(address to, uint256 amount, uint256 itemDefID, bool isFungible) public onlyOwner returns (uint256 mintedTokenID) {
         if (isFungible) {
             uint256 existingTokenID = itemDefIDToTokenIDs[itemDefID][0];
             _mint(to, existingTokenID, amount, "");
