@@ -9,7 +9,8 @@ import "./interfaces/IBaseBehavior.sol";
 contract InventoryController is Owned, Initializable {
     mapping(IBaseBehavior => bool) public isBehaviorEnabled;
 
-    event EnabledStatusSet(IBaseBehavior indexed behavior, bool enableStatus);
+    event BehaviorEnabled(IBaseBehavior indexed behavior);
+    event BehaviorDisabled(IBaseBehavior indexed behavior);
     event BehaviorExecuted(address indexed player, IBaseBehavior indexed behavior);
 
     constructor(address _owner) Owned(_owner) {}
@@ -18,13 +19,18 @@ contract InventoryController is Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
-    function setEnabledStatus(IBaseBehavior behavior, bool enableStatus) public onlyOwner {
-        isBehaviorEnabled[behavior] = enableStatus;
-        emit EnabledStatusSet(behavior, enableStatus);
+    function enable(IBaseBehavior behavior) public onlyOwner {
+        isBehaviorEnabled[behavior] = true;
+        emit BehaviorEnabled(behavior);
     }
 
-    function executeBehavior(IBaseBehavior behavior, bytes calldata data) public payable {
-        require(isBehaviorEnabled[behavior], "Behavior isn't in enabled.");
+    function disable(IBaseBehavior behavior) public onlyOwner {
+        isBehaviorEnabled[behavior] = false;
+        emit BehaviorDisabled(behavior);
+    }
+
+    function execute(IBaseBehavior behavior, bytes calldata data) public payable {
+        require(isBehaviorEnabled[behavior], "Behavior isn't enabled");
         behavior.execute{value: msg.value}(msg.sender, data);
         emit BehaviorExecuted(msg.sender, behavior);
     }

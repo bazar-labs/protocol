@@ -7,18 +7,17 @@ import "solmate/auth/Owned.sol";
 import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 
 contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
-    uint256 private _itemDefID = 1;
+    uint256 private _itemDefinitionID = 1;
     uint256 private _tokenID = 1;
 
-    mapping(uint256 => string) public itemDefIDToURI;
-    mapping(uint256 => uint256[]) public itemDefIDToTokenIDs;
+    mapping(uint256 => string) public itemDefinitionIDToURI;
+    mapping(uint256 => uint256[]) public itemDefinitionIDToTokenIDs;
     mapping(uint256 => bool) public isItemDefinitionIDPublished;
 
-    event ItemDefinitionCreated(uint256 indexed itemDefID, uint256 indexed tokenID, string indexed itemDefURI);
-
-    event ItemDefinitionUpdated(uint256 indexed itemDefID, string indexed oldItemDefURI, string indexed newItemDefURI);
-
-    event PublishStateUpdated(uint256 indexed itemDefID, bool indexed publishStatus);
+    event ItemDefinitionCreated(uint256 indexed itemDefinitionID, uint256 indexed tokenID, string indexed URI);
+    event ItemDefinitionUpdated(uint256 indexed itemDefinitionID, string indexed oldURI, string indexed newURI);
+    event ItemDefinitionPublished(uint256 indexed itemDefinitionID);
+    event ItemDefinitionUnpublished(uint256 indexed itemDefinitionID);
 
     constructor(address _owner) Owned(_owner) SolidStateERC1155() {}
 
@@ -26,39 +25,42 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
-    function createItemDefinition(string calldata itemDefURI) external onlyOwner {
-        itemDefIDToURI[_itemDefID] = itemDefURI;
-        itemDefIDToTokenIDs[_itemDefID].push(_tokenID);
-        emit ItemDefinitionCreated(_itemDefID, _tokenID, itemDefURI);
-        _itemDefID++;
+    function create(string calldata URI) external onlyOwner {
+        itemDefinitionIDToURI[_itemDefinitionID] = URI;
+        itemDefinitionIDToTokenIDs[_itemDefinitionID].push(_tokenID);
+        emit ItemDefinitionCreated(_itemDefinitionID, _tokenID, URI);
+        _itemDefinitionID++;
         _tokenID++;
     }
 
-    function updateItemDefinition(uint256 itemDefID, string calldata newItemDefURI) external onlyOwner {
-        string memory oldItemDefURI = itemDefIDToURI[itemDefID];
-        itemDefIDToURI[itemDefID] = newItemDefURI;
-        emit ItemDefinitionUpdated(_tokenID, oldItemDefURI, newItemDefURI);
+    function update(uint256 itemDefinitionID, string calldata newURI) external onlyOwner {
+        string memory oldURI = itemDefinitionIDToURI[itemDefinitionID];
+        itemDefinitionIDToURI[itemDefinitionID] = newURI;
+        emit ItemDefinitionUpdated(itemDefinitionID, oldURI, newURI);
     }
 
-    function setPublishStatus(uint256 itemDefID, bool publishStatus) external onlyOwner {
-        isItemDefinitionIDPublished[itemDefID] = publishStatus;
-        emit PublishStateUpdated(itemDefID, publishStatus);
+    function publish(uint256 itemDefinitionID) external onlyOwner {
+        isItemDefinitionIDPublished[itemDefinitionID] = true;
+        emit ItemDefinitionPublished(itemDefinitionID);
     }
 
-    function burnFrom(address player, uint256 tokenID, uint256 amount) public {
-        require(isApprovedForAll(player, msg.sender), "Caller is not approved");
-        _burn(player, tokenID, amount);
+    function unpublish(uint256 itemDefinitionID) external onlyOwner {
+        isItemDefinitionIDPublished[itemDefinitionID] = false;
+        emit ItemDefinitionUnpublished(itemDefinitionID);
     }
 
-    function mintTo(address to, uint256 amount, uint256 itemDefID, bool isFungible) public onlyOwner returns (uint256 mintedTokenID) {
+    function mint(address to, uint256 amount, uint256 itemDefinitionID, bool isFungible) public onlyOwner {
         if (isFungible) {
-            uint256 existingTokenID = itemDefIDToTokenIDs[itemDefID][0];
+            uint256 existingTokenID = itemDefinitionIDToTokenIDs[itemDefinitionID][0];
             _mint(to, existingTokenID, amount, "");
-            return existingTokenID;
         } else {
             _mint(to, _tokenID, amount, "");
             _tokenID++;
-            return _tokenID - 1;
         }
+    }
+
+    function burn(address player, uint256 tokenID, uint256 amount) public {
+        require(isApprovedForAll(player, msg.sender), "Caller is not approved");
+        _burn(player, tokenID, amount);
     }
 }

@@ -4,16 +4,16 @@ pragma solidity ^0.8.13;
 import "../interfaces/IInventoryRegistry.sol";
 
 abstract contract BaseBehavior {
-    address public inventoryController;
-    IInventoryRegistry public inventoryRegistry;
+    address public controller;
+    IInventoryRegistry public registry;
 
-    constructor(address inventoryController_, IInventoryRegistry inventoryRegistry_) {
-        inventoryController = inventoryController_;
-        inventoryRegistry = inventoryRegistry_;
+    constructor(address _controller, IInventoryRegistry _registry) {
+        controller = _controller;
+        registry = _registry;
     }
 
-    modifier onlyGame() {
-        require(msg.sender == inventoryController, "Caller is not the game");
+    modifier onlyController() {
+        require(msg.sender == controller, "Caller is not the controller");
         _;
     }
 
