@@ -105,15 +105,35 @@ contract Test_InventoryRegistry_publish_unpublish is Test, Setup {
 contract Test_InventoryRegistry_mint is Test, Setup {
     function test_should_mint_the_correct_amount_of_fungible_items() public {
         uint256 id = registry.create("https://example.com/item1");
+        registry.publish(id);
         assertEq(registry.balanceOf(player, id), 0, "Balance should be 0");
         registry.mint(player, id, 10, true);
         assertEq(registry.balanceOf(player, id), 10, "Balance should be 10");
+    }
+
+    function test_should_not_mint_if_not_owner() public {
+        uint256 id = registry.create("https://example.com/item1");
+        vm.prank(player);
+        vm.expectRevert(bytes("UNAUTHORIZED"));
+        registry.mint(player, id, 10, true);
+    }
+
+    function test_should_not_mint_if_item_does_not_exist() public {
+        vm.expectRevert(bytes("Item definition does not exist"));
+        registry.mint(player, 404, 10, true);
+    }
+
+    function test_should_not_mint_if_item_is_not_published() public {
+        uint256 id = registry.create("https://example.com/item1");
+        vm.expectRevert(bytes("Item definition is not published"));
+        registry.mint(player, id, 10, true);
     }
 }
 
 contract Test_InventoryRegistry_burn is Test, Setup {
     function test_should_burn_the_correct_amount_of_fungible_items() public {
         uint256 id = registry.create("https://example.com/item1");
+        registry.publish(id);
         registry.mint(player, id, 50, true);
         vm.prank(player);
         registry.setApprovalForAll(owner, true);

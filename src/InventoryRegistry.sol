@@ -90,6 +90,7 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     /// @param isFungible Whether or not the token is fungible
     function mint(address player, uint256 itemDefinitionID, uint256 amount, bool isFungible) public onlyOwner {
         require(exists(itemDefinitionID), "Item definition does not exist");
+        require(isItemDefinitionIDPublished[itemDefinitionID], "Item definition is not published");
         if (isFungible) {
             uint256 tokenID = itemDefinitionIDToTokenIDs[itemDefinitionID][0];
             _mint(player, tokenID, amount, "");
