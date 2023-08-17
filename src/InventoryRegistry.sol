@@ -29,27 +29,41 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
+    function nextItemDefinitionID() private returns (uint256) {
+        _itemDefinitionID++;
+        return _itemDefinitionID;
+    }
+
+    function nextTokenID(uint256 itemDefinitionID) private returns (uint256) {
+        _tokenID++;
+        itemDefinitionIDToTokenIDs[itemDefinitionID].push(_tokenID);
+        return _tokenID;
+    }
+
     function exists(uint256 itemDefinitionID) public view returns (bool) {
         return bytes(itemDefinitionIDToURI[itemDefinitionID]).length != 0;
     }
 
     /// @notice Creates a new item definition
     /// @param URI URI of the item definition
-    function create(string calldata URI) external onlyOwner {
-        _itemDefinitionID++;
-        _tokenID++;
-        itemDefinitionIDToTokenIDs[_itemDefinitionID].push(_tokenID);
-        itemDefinitionIDToURI[_itemDefinitionID] = URI;
-        emit ItemDefinitionCreated(_itemDefinitionID, _tokenID, URI);
+    /// @return itemDefinitionID ID of the item definition
+    function create(string calldata URI) external onlyOwner returns (uint256) {
+        require(bytes(URI).length != 0, "URI is empty");
+        uint256 itemDefinitionID = nextItemDefinitionID();
+        uint256 tokenID = nextTokenID(itemDefinitionID);
+        itemDefinitionIDToURI[itemDefinitionID] = URI;
+        emit ItemDefinitionCreated(itemDefinitionID, tokenID, URI);
+        return itemDefinitionID;
     }
 
     /// @notice Updates the URI of an item definition
     /// @param itemDefinitionID ID of the item definition
     /// @param newURI New URI of the item definition
     function update(uint256 itemDefinitionID, string calldata newURI) external onlyOwner {
+        require(bytes(newURI).length != 0, "URI is empty");
         require(exists(itemDefinitionID), "Item definition does not exist");
-        string memory oldURI = itemDefinitionIDToURI[itemDefinitionID];
         itemDefinitionIDToURI[itemDefinitionID] = newURI;
+        string memory oldURI = itemDefinitionIDToURI[itemDefinitionID];
         emit ItemDefinitionUpdated(itemDefinitionID, oldURI, newURI);
     }
 
@@ -77,12 +91,11 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     function mint(address player, uint256 itemDefinitionID, uint256 amount, bool isFungible) public onlyOwner {
         require(exists(itemDefinitionID), "Item definition does not exist");
         if (isFungible) {
-            uint256 existingTokenID = itemDefinitionIDToTokenIDs[itemDefinitionID][0];
-            _mint(player, existingTokenID, amount, "");
+            uint256 tokenID = itemDefinitionIDToTokenIDs[itemDefinitionID][0];
+            _mint(player, tokenID, amount, "");
         } else {
-            _tokenID++;
-            itemDefinitionIDToTokenIDs[itemDefinitionID].push(_tokenID);
-            _mint(player, _tokenID, amount, "");
+            uint256 tokenID = nextTokenID(itemDefinitionID);
+            _mint(player, tokenID, amount, "");
         }
     }
 

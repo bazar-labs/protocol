@@ -18,7 +18,7 @@ interface IInventoryRegistry {
     function balanceOf(address account, uint256 id) external view returns (uint256);
     function balanceOfBatch(address[] memory accounts, uint256[] memory ids) external view returns (uint256[] memory);
     function burn(address player, uint256 tokenID, uint256 amount) external;
-    function create(string memory URI) external;
+    function create(string memory URI) external returns (uint256);
     function exists(uint256 itemDefinitionID) external view returns (bool);
     function init(bytes memory data) external payable;
     function isApprovedForAll(address account, address operator) external view returns (bool);
