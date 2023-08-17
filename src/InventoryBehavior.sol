@@ -3,6 +3,8 @@ pragma solidity ^0.8.13;
 
 import "./interfaces/IInventoryRegistry.sol";
 
+/// @title InventoryBehavior
+/// @notice Abstract contract for inventory behaviors
 abstract contract InventoryBehavior {
     address public controller;
     IInventoryRegistry public registry;
@@ -22,5 +24,8 @@ abstract contract InventoryBehavior {
         _;
     }
 
+    /// @notice Executes the behavior
+    /// @param player Player executing the behavior
+    /// @param data ABI-encoded data to pass to behavior
     function execute(address player, bytes calldata data) public payable virtual;
 }
