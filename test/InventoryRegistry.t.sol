@@ -24,11 +24,6 @@ contract Test_InventoryRegistry_create is Test, Setup {
         assertEq(registry.itemDefinitionIDToURI(id), URI, "URI should be set");
     }
 
-    function test_should_not_create_item_if_uri_is_empty() public {
-        vm.expectRevert(bytes("URI is empty"));
-        registry.create("");
-    }
-
     function test_should_correctly_increment_item_definition_id_and_token_id() public {
         string memory URI1 = "https://example.com/item1";
         string memory URI2 = "https://example.com/item2";
@@ -41,6 +36,11 @@ contract Test_InventoryRegistry_create is Test, Setup {
 
         assertEq(registry.itemDefinitionIDToTokenIDs(id1, 0), 1, "Token ID should be 1");
         assertEq(registry.itemDefinitionIDToTokenIDs(id2, 0), 2, "Token ID should be 2");
+    }
+
+    function test_should_not_create_item_if_uri_is_empty() public {
+        vm.expectRevert(bytes("URI is empty"));
+        registry.create("");
     }
 
     function test_should_not_create_item_if_not_owner() public {
@@ -89,7 +89,7 @@ contract Test_InventoryRegistry_publish_unpublish is Test, Setup {
         assertEq(registry.isItemDefinitionIDPublished(id), false, "Item should be unpublished");
     }
 
-    function test_should_not_publish_if_not_owner() public {
+    function test_should_not_publish_or_unpublish_if_not_owner() public {
         uint256 id = registry.create("https://example.com/item1");
 
         vm.prank(player);
@@ -138,6 +138,6 @@ contract Test_InventoryRegistry_burn is Test, Setup {
         vm.prank(player);
         registry.setApprovalForAll(owner, true);
         registry.burn(player, id, 49);
-        assert(registry.balanceOf(player, id) == 1);
+        assertEq(registry.balanceOf(player, id), 1, "Balance should be 1");
     }
 }
