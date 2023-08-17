@@ -8,9 +8,11 @@ import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 contract PurchaseItemEth is BaseBehavior, Owned, Initializable {
     mapping(uint256 => uint256) public prices;
 
-    event CurrencyPurchased(address indexed player, uint256 indexed itemDefinitionID, uint256 amount);
+    event ItemPurchased(address indexed player, uint256 indexed itemDefinitionID, uint256 amount);
 
     event PriceSet(uint256 indexed itemDefinitionID, uint256 indexed price);
+
+    event ListingDeleted(uint256 itemDefinitionID);
 
     constructor(address _owner, address inventoryController_, IInventoryRegistry inventoryRegistry_)
         Owned(_owner)
@@ -21,8 +23,14 @@ contract PurchaseItemEth is BaseBehavior, Owned, Initializable {
         (owner, inventoryController, inventoryRegistry) = abi.decode(data, (address, address, IInventoryRegistry));
     }
 
-    function setPriceForCurrency(uint256 itemDefinitionID, uint256 price) public onlyOwner {
+    function setPriceForItem(uint256 itemDefinitionID, uint256 price) public onlyOwner {
         prices[itemDefinitionID] = price;
+        emit PriceSet(itemDefinitionID, price);
+    }
+
+    function deleteListing(uint256 itemDefinitionID) public onlyOwner {
+        require(prices[itemDefinitionID] != 0, "Item not found");
+        delete prices[itemDefinitionID];
     }
 
     function execute(address player, bytes calldata data) public payable override onlyGame {
@@ -37,6 +45,6 @@ contract PurchaseItemEth is BaseBehavior, Owned, Initializable {
         // Assume that `mintTo` function requires definitionId instead of tokenId
         inventoryRegistry.mintTo(player, amount, itemDefinitionID, true);
 
-        emit CurrencyPurchased(player, itemDefinitionID, 1);
+        emit ItemPurchased(player, itemDefinitionID, 1);
     }
 }

@@ -4,15 +4,13 @@ pragma solidity ^0.8.13;
 
 import "solmate/auth/Owned.sol";
 import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
-
-interface IInventoryBehavior {
-    function execute(address behavior, bytes calldata data) external payable;
-}
+import "./interfaces/IBaseBehavior.sol";
 
 contract InventoryController is Owned, Initializable {
-    mapping(IInventoryBehavior => bool) public isInventoryBehavior;
+    mapping(IBaseBehavior => bool) public isBehaviorEnabled;
 
-    event BehaviorSet(IInventoryBehavior indexed behavior, bool state);
+    event EnabledStatusSet(IBaseBehavior indexed behavior, bool enableStatus);
+    event BehaviorExecuted(address indexed player, IBaseBehavior indexed behavior);
 
     constructor(address _owner) Owned(_owner) {}
 
@@ -20,13 +18,14 @@ contract InventoryController is Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
-    function setBehavior(IInventoryBehavior behavior, bool state) public onlyOwner {
-        isInventoryBehavior[behavior] = state;
-        emit BehaviorSet(behavior, state);
+    function setEnabledStatus(IBaseBehavior behavior, bool enableStatus) public onlyOwner {
+        isBehaviorEnabled[behavior] = enableStatus;
+        emit EnabledStatusSet(behavior, enableStatus);
     }
 
-    function executeBehavior(IInventoryBehavior behavior, bytes calldata data) public payable {
-        require(isInventoryBehavior[behavior], "Behavior isn't in isInventoryBehavior");
+    function executeBehavior(IBaseBehavior behavior, bytes calldata data) public payable {
+        require(isBehaviorEnabled[behavior], "Behavior isn't in enabled.");
         behavior.execute{value: msg.value}(msg.sender, data);
+        emit BehaviorExecuted(msg.sender, behavior);
     }
 }

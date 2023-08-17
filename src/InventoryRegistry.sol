@@ -12,10 +12,13 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
 
     mapping(uint256 => string) public itemDefIDToURI;
     mapping(uint256 => uint256[]) public itemDefIDToTokenIDs;
+    mapping(uint256 => bool) public isItemDefinitionIDPublished;
 
     event ItemDefinitionCreated(uint256 indexed itemDefID, uint256 indexed tokenID, string indexed itemDefURI);
 
     event ItemDefinitionUpdated(uint256 indexed itemDefID, string indexed oldItemDefURI, string indexed newItemDefURI);
+
+    event PublishStateUpdated(uint256 indexed itemDefID, bool indexed publishStatus);
 
     constructor(address _owner) Owned(_owner) SolidStateERC1155() {}
 
@@ -35,6 +38,11 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         string memory oldItemDefURI = itemDefIDToURI[itemDefID];
         itemDefIDToURI[itemDefID] = newItemDefURI;
         emit ItemDefinitionUpdated(_tokenID, oldItemDefURI, newItemDefURI);
+    }
+
+    function setPublishStatus(uint256 itemDefID, bool publishStatus) external onlyOwner {
+        isItemDefinitionIDPublished[itemDefID] = publishStatus;
+        emit PublishStateUpdated(itemDefID, publishStatus);
     }
 
     function burnFrom(address player, uint256 tokenID, uint256 amount) public {
