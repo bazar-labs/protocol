@@ -53,7 +53,7 @@ contract PurchaseItemWithETH is InventoryBehavior, Owned, Initializable {
         require(msg.value == price * amount, "Insufficient funds to purchase item");
 
         // FIXME listing might be or might not be fungible
-        registry.mint(player, amount, itemDefinitionID, true);
+        registry.mint(player, itemDefinitionID, amount, true);
 
         // FIXME user might purchase multiple items at once
         emit ItemPurchased(player, itemDefinitionID, 1);

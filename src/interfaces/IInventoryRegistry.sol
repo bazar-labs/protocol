@@ -19,12 +19,13 @@ interface IInventoryRegistry {
     function balanceOfBatch(address[] memory accounts, uint256[] memory ids) external view returns (uint256[] memory);
     function burn(address player, uint256 tokenID, uint256 amount) external;
     function create(string memory URI) external;
+    function exists(uint256 itemDefinitionID) external view returns (bool);
     function init(bytes memory data) external payable;
     function isApprovedForAll(address account, address operator) external view returns (bool);
     function isItemDefinitionIDPublished(uint256) external view returns (bool);
     function itemDefinitionIDToTokenIDs(uint256, uint256) external view returns (uint256);
     function itemDefinitionIDToURI(uint256) external view returns (string memory);
-    function mint(address to, uint256 amount, uint256 itemDefinitionID, bool isFungible) external;
+    function mint(address player, uint256 itemDefinitionID, uint256 amount, bool isFungible) external;
     function owner() external view returns (address);
     function publish(uint256 itemDefinitionID) external;
     function safeBatchTransferFrom(

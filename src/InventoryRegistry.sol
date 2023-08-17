@@ -9,8 +9,8 @@ import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 /// @title InventoryRegistry
 /// @notice Registry of item definitions and tokens, implements ERC-1155
 contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
-    uint256 private _itemDefinitionID = 1;
-    uint256 private _tokenID = 1;
+    uint256 private _itemDefinitionID = 0;
+    uint256 private _tokenID = 0;
 
     mapping(uint256 => string) public itemDefinitionIDToURI;
     mapping(uint256 => uint256[]) public itemDefinitionIDToTokenIDs;
@@ -29,20 +29,25 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
         owner = abi.decode(data, (address));
     }
 
+    function exists(uint256 itemDefinitionID) public view returns (bool) {
+        return bytes(itemDefinitionIDToURI[itemDefinitionID]).length != 0;
+    }
+
     /// @notice Creates a new item definition
     /// @param URI URI of the item definition
     function create(string calldata URI) external onlyOwner {
-        itemDefinitionIDToURI[_itemDefinitionID] = URI;
-        itemDefinitionIDToTokenIDs[_itemDefinitionID].push(_tokenID);
-        emit ItemDefinitionCreated(_itemDefinitionID, _tokenID, URI);
         _itemDefinitionID++;
         _tokenID++;
+        itemDefinitionIDToTokenIDs[_itemDefinitionID].push(_tokenID);
+        itemDefinitionIDToURI[_itemDefinitionID] = URI;
+        emit ItemDefinitionCreated(_itemDefinitionID, _tokenID, URI);
     }
 
     /// @notice Updates the URI of an item definition
     /// @param itemDefinitionID ID of the item definition
     /// @param newURI New URI of the item definition
     function update(uint256 itemDefinitionID, string calldata newURI) external onlyOwner {
+        require(exists(itemDefinitionID), "Item definition does not exist");
         string memory oldURI = itemDefinitionIDToURI[itemDefinitionID];
         itemDefinitionIDToURI[itemDefinitionID] = newURI;
         emit ItemDefinitionUpdated(itemDefinitionID, oldURI, newURI);
@@ -51,6 +56,7 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     /// @notice Publishes an item definition, allowing it to be minted
     /// @param itemDefinitionID ID of the item definition
     function publish(uint256 itemDefinitionID) external onlyOwner {
+        require(exists(itemDefinitionID), "Item definition does not exist");
         isItemDefinitionIDPublished[itemDefinitionID] = true;
         emit ItemDefinitionPublished(itemDefinitionID);
     }
@@ -58,22 +64,25 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     /// @notice Unpublishes an item definition, preventing it from being minted
     /// @param itemDefinitionID ID of the item definition
     function unpublish(uint256 itemDefinitionID) external onlyOwner {
+        require(exists(itemDefinitionID), "Item definition does not exist");
         isItemDefinitionIDPublished[itemDefinitionID] = false;
         emit ItemDefinitionUnpublished(itemDefinitionID);
     }
 
     /// @notice Mints a fungible or non-fungible token to a player based on an item definition
-    /// @param to Address of the player to mint to
+    /// @param player Address of the player to mint to
     /// @param amount Amount of tokens to mint
     /// @param itemDefinitionID ID of the item definition
     /// @param isFungible Whether or not the token is fungible
-    function mint(address to, uint256 amount, uint256 itemDefinitionID, bool isFungible) public onlyOwner {
+    function mint(address player, uint256 itemDefinitionID, uint256 amount, bool isFungible) public onlyOwner {
+        require(exists(itemDefinitionID), "Item definition does not exist");
         if (isFungible) {
             uint256 existingTokenID = itemDefinitionIDToTokenIDs[itemDefinitionID][0];
-            _mint(to, existingTokenID, amount, "");
+            _mint(player, existingTokenID, amount, "");
         } else {
-            _mint(to, _tokenID, amount, "");
             _tokenID++;
+            itemDefinitionIDToTokenIDs[itemDefinitionID].push(_tokenID);
+            _mint(player, _tokenID, amount, "");
         }
     }
 
