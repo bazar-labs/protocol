@@ -5,17 +5,12 @@ import "forge-std/Script.sol";
 import "BoringSolidity/BoringFactory.sol";
 import "src/InventoryController.sol";
 import "src/InventoryRegistry.sol";
-import "src/behaviors/PurchaseItemEth.sol";
+import "src/behaviors/PurchaseItemWithETH.sol";
 
 contract DeployMasterContracts is Script {
     function run()
         public
-        returns (
-            BoringFactory factory,
-            InventoryRegistry registry,
-            InventoryController controller,
-            PurchaseItemEth purchase
-        )
+        returns (BoringFactory factory, InventoryRegistry registry, InventoryController controller, PurchaseItemWithETH purchase)
     {
         vm.startBroadcast();
 
@@ -27,8 +22,7 @@ contract DeployMasterContracts is Script {
         controller = new InventoryController(tx.origin);
 
         // behaviors
-        purchase =
-        new PurchaseItemEth(tx.origin, address(controller), IInventoryRegistry(address(registry)));
+        purchase = new PurchaseItemWithETH(tx.origin, address(controller), IInventoryRegistry(address(registry)));
 
         vm.stopBroadcast();
     }
