@@ -10,8 +10,8 @@ import "openzeppelin-contracts/contracts/proxy/utils/Initializable.sol";
 contract PurchaseItemWithETH is InventoryBehavior, Owned, Initializable {
     mapping(uint256 => uint256) public listings;
 
-    event ListingSet(uint256 indexed itemDefinitionID, uint256 indexed price);
-    event ListingRemoved(uint256 indexed itemDefinitionID);
+    event ItemListingSet(uint256 indexed itemDefinitionID, uint256 indexed price);
+    event ItemListingRemoved(uint256 indexed itemDefinitionID);
     event ItemPurchased(address indexed player, uint256 indexed itemDefinitionID, uint256 amount);
 
     constructor(address _owner, address _controller, IInventoryRegistry _registry)
@@ -31,7 +31,7 @@ contract PurchaseItemWithETH is InventoryBehavior, Owned, Initializable {
     function set(uint256 itemDefinitionID, uint256 price) public onlyOwner {
         require(price > 0, "Price must be greater than 0");
         listings[itemDefinitionID] = price;
-        emit ListingSet(itemDefinitionID, price);
+        emit ItemListingSet(itemDefinitionID, price);
     }
 
     /// @notice Removes the price for an item
@@ -39,7 +39,7 @@ contract PurchaseItemWithETH is InventoryBehavior, Owned, Initializable {
     function remove(uint256 itemDefinitionID) public onlyOwner {
         require(listings[itemDefinitionID] > 0, "Item isn't listed");
         delete listings[itemDefinitionID];
-        emit ListingRemoved(itemDefinitionID);
+        emit ItemListingRemoved(itemDefinitionID);
     }
 
     /// @notice Mint item(s) to a player in exchange for ETH
@@ -55,7 +55,6 @@ contract PurchaseItemWithETH is InventoryBehavior, Owned, Initializable {
         // FIXME listing might be or might not be fungible
         registry.mint(player, itemDefinitionID, amount, true);
 
-        // FIXME user might purchase multiple items at once
-        emit ItemPurchased(player, itemDefinitionID, 1);
+        emit ItemPurchased(player, itemDefinitionID, amount);
     }
 }

@@ -62,8 +62,8 @@ contract InventoryRegistry is SolidStateERC1155, Owned, Initializable {
     function update(uint256 itemDefinitionID, string calldata newURI) external onlyOwner {
         require(bytes(newURI).length != 0, "URI is empty");
         require(exists(itemDefinitionID), "Item definition does not exist");
-        itemDefinitionIDToURI[itemDefinitionID] = newURI;
         string memory oldURI = itemDefinitionIDToURI[itemDefinitionID];
+        itemDefinitionIDToURI[itemDefinitionID] = newURI;
         emit ItemDefinitionUpdated(itemDefinitionID, oldURI, newURI);
     }
 
